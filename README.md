@@ -1,13 +1,13 @@
-# 光坞影像·底片块库验收
+# 光坞影像·异地底片库离线同步验收
 
-以 SHA-256 内容寻址去重，从选中快照复原并列出损坏或缺失块。面向演示数据和本地复现，场景、操作剧本和业务边界见 [BUSINESS.md](BUSINESS.md)。
+按接收方已验收的基准从发件接口取增量包，共享块只传一次；接收方验块、验整份后一次性切换在役版本。面向演示数据和本地复现，场景、操作剧本和业务边界见 [BUSINESS.md](BUSINESS.md)。
 
 ## 业务模块
 
-- 底片快照
-- 内容块目录
-- 还原查验
-- 留存清单
+- 版本链
+- 增量包
+- 投递验收
+- 接收台账
 
 ## 本地运行
 
@@ -45,7 +45,7 @@ docker compose up -d --build --wait
 | db | MySQL 8.0，持久卷保存档案、执行、证据及审计 |
 | redis | Redis 7，追加日志卷保存队列唤醒信号 |
 
-编辑 `backend/src/services/domain.py` 可修改试算方法与业务表单说明。API 路由、数据定义和页面位于 `backend/src/routes/`、`backend/src/models/` 与 `frontend/src/pages/`。开发时更新源文件后重新构建对应服务。
+编辑 `backend/src/services/domain.py` 可修改验收口径与业务表单说明，发件接口与接收方模拟位于 `backend/src/services/offline_sync.py`。API 路由、数据定义和页面位于 `backend/src/routes/`、`backend/src/models/` 与 `frontend/src/pages/`。领域测试运行方式：`docker compose exec -T backend python -m tests.test_offline_sync`（仓库内为 `cd backend && python3 -m tests.test_offline_sync`）。开发时更新源文件后重新构建对应服务。
 
 `.env.example` 提供 `FRONTEND_PORT`、`BACKEND_PORT`、`DB_PORT`、`DB_PASSWORD`、`AUTH_KEY` 、`SEED_DEMO` 与 `NETWORK_SUBNET`。修改 `NETWORK_SUBNET` 可避开本机现有容器网段。所有发布的端口绑定本机回环地址。接入独立部署前需配置自己的凭据并按业务范围做独立验收。
 
